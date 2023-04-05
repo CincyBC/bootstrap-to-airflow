@@ -21,7 +21,7 @@ def test_web_call(mock_requests_get):
 
 def test_get_fund_values():
     soup = BeautifulSoup(
-        '<html><head></head><body><div class="fund">$US 1,000.00</div></body></html>', 'html.parser')
+        '<html><head></head><body><div class="fund">$US1,000.00</div></body></html>', 'html.parser')
     result = get_fund_values(soup, 0, 'fund')
     assert result == '1000.00'
 
