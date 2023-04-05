@@ -3,6 +3,7 @@ from unittest.mock import patch
 from bs4 import BeautifulSoup
 import json
 import pytest
+from src.functional_scraper import web_call, get_fund_values, write_json
 
 
 @pytest.fixture
