@@ -12,11 +12,23 @@ def mock_requests_get():
         yield mock_get
 
 
+@pytest.fixture
+def mock_requests_failed_get():
+    with patch.object(requests, 'get') as mock_get:
+        mock_get.return_value.status_code = 400
+        yield mock_get
+
+
 def test_web_call(mock_requests_get):
     mock_requests_get.return_value.status_code = 200
     mock_requests_get.return_value.content = '<html><head></head><body><div></div></body></html>'
     result = web_call('http://www.example.com')
     assert isinstance(result, BeautifulSoup)
+
+
+def test_failed_web_call(mock_requests_failed_get):
+    result = web_call('http://www.example.com')
+    assert result == 400
 
 
 def test_get_fund_values():

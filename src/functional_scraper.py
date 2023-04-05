@@ -7,7 +7,9 @@ def web_call(url):  # Extract
     r = requests.get(url)
     if r.status_code == 200:
         soup: BeautifulSoup = BeautifulSoup(r.content, "html.parser")
-    return soup
+        return soup
+    else:
+        return r.status_code
 
 
 def get_fund_values(soup, index, class_name):  # Transform
