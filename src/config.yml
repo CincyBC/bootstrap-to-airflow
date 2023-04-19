@@ -1,0 +1,4 @@
+sprott:
+  url: https://sprott.com/investment-strategies/physical-commodity-funds/uranium/
+  class_name:
+    - fundHeader_value: {4: shareprice, 6: u3o8_stock}

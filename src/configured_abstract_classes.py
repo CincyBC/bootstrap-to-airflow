@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import json
 import requests
 from bs4 import BeautifulSoup
+from yaml import safe_load
 
 
 class WebRequester(ABC):
@@ -35,13 +36,15 @@ class FundScraper:
         self.transformer = transformer
         self.writer = writer
 
-    def run(self, url, indexes, class_name, filename='data.json'):
+    def run(self, url, indexes, value_names, class_name, filename='data.json'):
         response = self.requester.get(url)
         if response.status_code != 200:
             raise ValueError(f"Error retrieving {url}: {response.status_code}")
         soup = self.parser.parse(response.content)
-        data = self.transformer.transform(
-            soup.find_all('div', class_=class_name), indexes)
+        data = {}
+        for index, index_number in enumerate(indexes):
+            data = self.transformer.transform(
+                soup.find_all('div', class_=class_name), data, index_number, value_names[index])
         self.writer.write(data, filename)
 
 
@@ -56,9 +59,10 @@ class BeautifulSoupHTMLParser(HTMLParser):
 
 
 class FundValueTransformer(DataTransformer):
-    def transform(self, values, indexes):
-        return {"values": [str(values[i].contents[0]).strip().replace('$US', '').replace(',', '')
-                           for i in indexes]}
+    def transform(self, values, dictionary: dict, index: int, value_name: str):
+        dictionary[value_name] = str(values[index].contents[0]).strip().replace(
+            '$US', '').replace(',', '')
+        return dictionary
 
 
 class JSONDataWriter(DataWriter):
@@ -68,10 +72,16 @@ class JSONDataWriter(DataWriter):
 
 
 if __name__ == '__main__':
+    config = safe_load(open('config.yml', 'r'))
+
     scraper = FundScraper(RequestsWebRequester(), BeautifulSoupHTMLParser(
     ), FundValueTransformer(), JSONDataWriter())
 
-    scraper.run(url='https://sprott.com/investment-strategies/physical-commodity-funds/uranium/',
-                indexes=[4, 6],
-                class_name='fundHeader_value',
-                filename='data.json')
+    for key, value in config.items():
+        for class_name in value['class_name']:
+            for tag, indexes in class_name.items():
+                scraper.run(url=value['url'],
+                            class_name=tag,
+                            indexes=[i for i in indexes.keys()],
+                            value_names=[v for v in indexes.values()],
+                            filename=f"{key}.json")
