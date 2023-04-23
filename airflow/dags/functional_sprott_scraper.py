@@ -50,3 +50,5 @@ with DAG(
         data['shareprice'] = get_fund_values(soup, 4, 'fundHeader_value')
         data['u3o8_stock'] = get_fund_values(soup, 6, 'fundHeader_value')
         write_json(data)
+
+    execute_scraper()
