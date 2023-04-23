@@ -1,5 +1,6 @@
 from bs4 import BeautifulSoup
-from datetime import datetime, timedelta
+import pendulum
+from datetime import timedelta
 
 from airflow import DAG
 from airflow.decorators import task
@@ -8,7 +9,6 @@ from airflow.decorators import task
 # Default args used when create a new dag
 args = {
     'owner': 'airflow',
-    'start_date': datetime(2022, 2, 27),
     'depends_on_past': False,
     'retries': 1,
     'retry_delay': timedelta(minutes=5),
@@ -18,6 +18,7 @@ args = {
 with DAG(
     dag_id='Functional_Sprott_Scraper',
     schedule_interval='5 20 * * 1-6',
+    start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
     default_args=args,
     render_template_as_native_obj=True,
     tags=['price', 'scraper']
