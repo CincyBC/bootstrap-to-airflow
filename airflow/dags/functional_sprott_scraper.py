@@ -2,7 +2,7 @@ from bs4 import BeautifulSoup
 from datetime import datetime, timedelta
 
 from airflow import DAG
-from airflow.utils.decorators import task
+from airflow.decorators import task
 
 
 # Default args used when create a new dag
